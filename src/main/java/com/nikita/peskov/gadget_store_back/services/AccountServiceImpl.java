@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,10 +27,15 @@ public class AccountServiceImpl implements AccountService {
         if (accountRepository.existsByEmail(account.getEmail())){
             throw new AccountAlreadyExistsException(account.getEmail() + " already exists");
         }
+        if (accountRepository.existsByUsername(account.getUsername())){
+            throw new AccountAlreadyExistsException(account.getUsername() + " already exists");
+        }
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         System.out.println(account.getPassword());
         Role accountRole = roleRepository.findByName("ADMIN").get();
+        account.setRegistrationDate(LocalDate.now());
         account.setRole(accountRole);
+        account.setBalance(0.0);
         return accountRepository.save(account);
     }
 
